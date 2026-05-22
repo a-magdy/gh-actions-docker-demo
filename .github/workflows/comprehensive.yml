@@ -4,8 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    # Ignore image-only pushes — the orchestrator handles build+test sequencing.
+    paths-ignore:
+      - "images/**"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "images/**"
 
 env:
   DOCKER_REGISTRY_URL: ghcr.io
@@ -154,4 +159,4 @@ jobs:
 
       - name: Test image
         shell: bash
-        run: docker run --rm ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"
+        run: docker run --rm --platform linux/amd64 ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"

@@ -8,22 +8,36 @@ on:
     branches: [main]
 
 jobs:
+  # Ensure images are present in GHCR before running any test.
+  # On first push (or after images/ changes), this builds and pushes them.
+  # On subsequent pushes the build is a no-op cache hit.
+  build-images:
+    name: Build Images
+    uses: ./.github/workflows/build-images.yml
+    permissions:
+      contents: read
+      packages: write
+
   test-composite:
     name: Composite
+    needs: build-images
     uses: ./.github/workflows/composite.yml
     secrets: inherit
 
   test-dockerfile:
     name: Dockerfile
+    needs: build-images
     uses: ./.github/workflows/dockerfile.yml
     secrets: inherit
 
   test-image:
     name: Image
+    needs: build-images
     uses: ./.github/workflows/image.yml
     secrets: inherit
 
   test-dind:
     name: Dind
+    needs: build-images
     uses: ./.github/workflows/dind.yml
     secrets: inherit
