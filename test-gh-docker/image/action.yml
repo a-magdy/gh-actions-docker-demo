@@ -1,11 +1,11 @@
 name: "Docker Image Private Registry"
 description: "Test Docker Image action with private registry"
-# Forks: change 'a-magdy' in the image ref below to your org/user after running build-images.
+# Forks: change 'a-magdy/test-gh-docker-actions' in the image ref below to your repo after running build-images.
 # Note: `image: docker://` fields do not support expressions — this must be a literal value.
 # See: https://github.com/orgs/community/discussions/26399
 runs:
   using: "docker"
-  image: "docker://ghcr.io/a-magdy/ubuntu"
+  image: "docker://ghcr.io/a-magdy/test-gh-docker-actions/ubuntu"
   args:
     - "/bin/sh"
     - "-c"

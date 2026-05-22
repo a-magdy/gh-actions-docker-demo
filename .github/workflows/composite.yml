@@ -24,4 +24,4 @@ jobs:
 
       - uses: a-magdy/test-gh-docker-actions/test-gh-docker/composite@main
         with:
-          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu
+          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu

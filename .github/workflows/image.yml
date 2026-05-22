@@ -40,6 +40,6 @@ jobs:
 
       # Pre-pull required: `image: docker://` in action.yml doesn't auto-pull private images.
       # See: https://github.com/orgs/community/discussions/26399
-      - run: docker pull ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu
+      - run: docker pull ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu
 
       - uses: ./test-gh-docker/image

@@ -32,7 +32,7 @@ jobs:
 
       - uses: a-magdy/test-gh-docker-actions/test-gh-docker/composite@main
         with:
-          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu
+          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu
 
   run-dockerfile-action-fails:
     name: Dockerfile (Fails)
@@ -91,7 +91,7 @@ jobs:
 
       # Pre-pull required: `image: docker://` in action.yml doesn't auto-pull private images.
       # See: https://github.com/orgs/community/discussions/26399
-      - run: docker pull ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu
+      - run: docker pull ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu
 
       - uses: ./test-gh-docker/image
 
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     container:
-      image: ghcr.io/${{ github.repository_owner }}/dind
+      image: ghcr.io/${{ github.repository }}/dind
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     container:
-      image: ghcr.io/${{ github.repository_owner }}/dind
+      image: ghcr.io/${{ github.repository }}/dind
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -142,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [dind-run-image-fails, dind-run-dockerfile-fails]
     container:
-      image: ghcr.io/${{ github.repository_owner }}/dind
+      image: ghcr.io/${{ github.repository }}/dind
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
@@ -159,4 +159,4 @@ jobs:
 
       - name: Test image
         shell: bash
-        run: docker run --rm --platform linux/amd64 ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"
+        run: docker run --rm --platform linux/amd64 ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu echo "Hello from Docker in DinD"
