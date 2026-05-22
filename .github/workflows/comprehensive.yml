@@ -4,8 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    # Ignore image-only pushes — the orchestrator handles build+test sequencing.
+    paths-ignore:
+      - "images/**"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "images/**"
 
 env:
   DOCKER_REGISTRY_URL: ghcr.io
