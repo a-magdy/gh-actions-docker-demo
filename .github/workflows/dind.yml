@@ -6,28 +6,28 @@ on:
 
 env:
   DOCKER_REGISTRY_URL: ghcr.io
-  DOCKER_REGISTRY_USER: a-magdy
+
+permissions:
+  contents: read
+  packages: read
 
 jobs:
   dind-run-image-fails:
     name: DinD - Image (Fails)
     runs-on: ubuntu-latest
     continue-on-error: true
-    permissions:
-      contents: read
-      packages: read
     container:
-      image: ghcr.io/a-magdy/dind
+      image: ghcr.io/${{ github.repository_owner }}/dind
       credentials:
-        username: ${{ env.DOCKER_REGISTRY_USER }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      options: --privileged # For Docker-in-Docker if needed
+      options: --privileged
     steps:
       - name: Docker Registry Login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
-          username: ${{ env.DOCKER_REGISTRY_USER }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Image Action
@@ -37,21 +37,18 @@ jobs:
     name: DinD - Dockerfile (Fails)
     runs-on: ubuntu-latest
     continue-on-error: true
-    permissions:
-      contents: read
-      packages: read
     container:
-      image: ghcr.io/a-magdy/dind
+      image: ghcr.io/${{ github.repository_owner }}/dind
       credentials:
-        username: ${{ env.DOCKER_REGISTRY_USER }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      options: --privileged # For Docker-in-Docker if needed
+      options: --privileged
     steps:
       - name: Docker Registry Login
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
-          username: ${{ env.DOCKER_REGISTRY_USER }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Dockerfile Action
@@ -61,15 +58,12 @@ jobs:
     name: DinD - Composite (Succeeds)
     runs-on: ubuntu-latest
     needs: [dind-run-image-fails, dind-run-dockerfile-fails]
-    permissions:
-      contents: read
-      packages: read
     container:
-      image: ghcr.io/a-magdy/dind
+      image: ghcr.io/${{ github.repository_owner }}/dind
       credentials:
-        username: ${{ env.DOCKER_REGISTRY_USER }}
+        username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      options: --privileged # For Docker-in-Docker if needed
+      options: --privileged
     steps:
       - uses: actions/checkout@v4
 
@@ -77,9 +71,9 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
-          username: ${{ env.DOCKER_REGISTRY_USER }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test image
         shell: bash
-        run: docker run --rm ghcr.io/a-magdy/ubuntu echo "Hello from Docker in DinD"
+        run: docker run --rm ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"

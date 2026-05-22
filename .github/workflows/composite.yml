@@ -6,22 +6,22 @@ on:
 
 env:
   DOCKER_REGISTRY_URL: ghcr.io
-  DOCKER_REGISTRY_USER: a-magdy
+
+permissions:
+  contents: read
+  packages: read
 
 jobs:
   run-composite-action-succeeds:
     name: Composite (Succeeds)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
     steps:
       - uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
-          username: ${{ env.DOCKER_REGISTRY_USER }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: a-magdy/test-gh-docker-actions/test-gh-docker/composite@main
         with:
-          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_REGISTRY_USER }}/ubuntu
+          image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu
