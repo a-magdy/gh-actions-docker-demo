@@ -126,3 +126,23 @@ This affects enterprise users with private registries and forces:
 
 - [josh-ops - Create a Docker Container Action Hosted in a Private Image Registry](https://josh-ops.com/posts/github-actions-docker-actions-private-registry/)
 - [moby/moby - Issue 38591](https://github.com/moby/moby/issues/38591) (potentially relevant)
+
+---
+
+## Fork Setup
+
+This repository is designed to be forkable. After forking:
+
+1. **Run `build-images` workflow** — Go to **Actions → Build and Push Images** and trigger it manually (`workflow_dispatch`). This builds the `ubuntu` and `dind` images from `images/` and pushes them to your GHCR namespace:
+   - `ghcr.io/YOUR-ORG/ubuntu:latest`
+   - `ghcr.io/YOUR-ORG/dind:latest`
+
+2. **(Optional) Make packages public** — In your GHCR package settings, set both packages to **Public** to avoid needing credentials for pulls.
+
+3. **Update hardcoded owner refs** — Two files contain a literal `a-magdy` that cannot use expressions:
+   - `test-gh-docker/dockerfile/Dockerfile` — update the `FROM` line
+   - `test-gh-docker/image/action.yml` — update the `image:` value
+
+   > All workflow files use `${{ github.repository_owner }}` and `${{ github.actor }}` automatically — no changes needed there.
+
+4. **Run any workflow** — Authentication uses `GITHUB_TOKEN` (built-in, no secrets to configure).
