@@ -76,4 +76,4 @@ jobs:
 
       - name: Test image
         shell: bash
-        run: docker run --rm ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"
+        run: docker run --rm --platform linux/amd64 ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository_owner }}/ubuntu echo "Hello from Docker in DinD"
