@@ -15,6 +15,7 @@ jobs:
   dind-run-image-fails:
     name: DinD - Image (Fails)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: true
     container:
       image: ghcr.io/${{ github.repository_owner }}/dind
@@ -36,6 +37,7 @@ jobs:
   dind-run-dockerfile-fails:
     name: DinD - Dockerfile (Fails)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: true
     container:
       image: ghcr.io/${{ github.repository_owner }}/dind
@@ -57,6 +59,7 @@ jobs:
   dind-composite-action-succeeds:
     name: DinD - Composite (Succeeds)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [dind-run-image-fails, dind-run-dockerfile-fails]
     container:
       image: ghcr.io/${{ github.repository_owner }}/dind
