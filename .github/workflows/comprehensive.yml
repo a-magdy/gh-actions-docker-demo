@@ -19,18 +19,20 @@ permissions:
   contents: read
   packages: read
 
+# Forks: the remote `uses: a-magdy/gh-actions-docker-demo/...@main` refs below are
+# literals (`uses:` cannot use expressions). Change them to your owner/repo.
 jobs:
   run-composite-action-succeeds:
     name: Composite (Succeeds)
     runs-on: ubuntu-latest
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: a-magdy/test-gh-docker-actions/test-gh-docker/composite@main
+      - uses: a-magdy/gh-actions-docker-demo/test-gh-docker/composite@main
         with:
           image: ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}/ubuntu
 
@@ -39,26 +41,26 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: a-magdy/test-gh-docker-actions/test-gh-docker/dockerfile@main
+      - uses: a-magdy/gh-actions-docker-demo/test-gh-docker/dockerfile@main
 
   run-dockerfile-action-succeeds:
     name: Dockerfile (Succeeds)
     runs-on: ubuntu-latest
     needs: run-dockerfile-action-fails
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Dockerfile Action
         uses: ./test-gh-docker/dockerfile
@@ -68,26 +70,26 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: a-magdy/test-gh-docker-actions/test-gh-docker/image@main
+      - uses: a-magdy/gh-actions-docker-demo/test-gh-docker/image@main
 
   run-image-action-succeeds:
     name: Image (Succeeds)
     runs-on: ubuntu-latest
     needs: run-image-action-fails
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Pre-pull required: `image: docker://` in action.yml doesn't auto-pull private images.
       # See: https://github.com/orgs/community/discussions/26399
@@ -107,14 +109,14 @@ jobs:
       options: --privileged
     steps:
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Image Action
-        uses: a-magdy/test-gh-docker-actions/test-gh-docker/image@main
+        uses: a-magdy/gh-actions-docker-demo/test-gh-docker/image@main
 
   dind-run-dockerfile-fails:
     name: DinD - Dockerfile (Fails)
@@ -128,14 +130,14 @@ jobs:
       options: --privileged
     steps:
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Dockerfile Action
-        uses: a-magdy/test-gh-docker-actions/test-gh-docker/dockerfile@main
+        uses: a-magdy/gh-actions-docker-demo/test-gh-docker/dockerfile@main
 
   dind-composite-action-succeeds:
     name: DinD - Composite (Succeeds)
@@ -148,10 +150,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}

@@ -5,7 +5,7 @@ description: "Test Docker Image action with private registry"
 # See: https://github.com/orgs/community/discussions/26399
 runs:
   using: "docker"
-  image: "docker://ghcr.io/a-magdy/ubuntu"
+  image: "docker://ghcr.io/a-magdy/gh-actions-docker-demo/ubuntu"
   args:
     - "/bin/sh"
     - "-c"
