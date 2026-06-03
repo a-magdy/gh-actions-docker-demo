@@ -11,6 +11,8 @@ permissions:
   contents: read
   packages: read
 
+# Forks: the remote `uses: a-magdy/gh-actions-docker-demo/...@main` refs below are
+# literals (`uses:` cannot use expressions). Change them to your owner/repo.
 jobs:
   dind-run-image-fails:
     name: DinD - Image (Fails)
@@ -24,14 +26,14 @@ jobs:
       options: --privileged
     steps:
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Image Action
-        uses: a-magdy/test-gh-docker-actions/test-gh-docker/image@main
+        uses: a-magdy/gh-actions-docker-demo/test-gh-docker/image@main
 
   dind-run-dockerfile-fails:
     name: DinD - Dockerfile (Fails)
@@ -45,14 +47,14 @@ jobs:
       options: --privileged
     steps:
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Dockerfile Action
-        uses: a-magdy/test-gh-docker-actions/test-gh-docker/dockerfile@main
+        uses: a-magdy/gh-actions-docker-demo/test-gh-docker/dockerfile@main
 
   dind-composite-action-succeeds:
     name: DinD - Composite (Succeeds)
@@ -65,10 +67,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Docker Registry Login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}

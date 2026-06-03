@@ -11,32 +11,34 @@ permissions:
   contents: read
   packages: read
 
+# Forks: the remote `uses: a-magdy/gh-actions-docker-demo/...@main` refs below are
+# literals (`uses:` cannot use expressions). Change them to your owner/repo.
 jobs:
   run-image-action-fails:
     name: Image (Fails)
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: a-magdy/test-gh-docker-actions/test-gh-docker/image@main
+      - uses: a-magdy/gh-actions-docker-demo/test-gh-docker/image@main
 
   run-image-action-succeeds:
     name: Image (Succeeds)
     runs-on: ubuntu-latest
     needs: run-image-action-fails
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       # Pre-pull required: `image: docker://` in action.yml doesn't auto-pull private images.
       # See: https://github.com/orgs/community/discussions/26399

@@ -11,32 +11,34 @@ permissions:
   contents: read
   packages: read
 
+# Forks: the remote `uses: a-magdy/gh-actions-docker-demo/...@main` refs below are
+# literals (`uses:` cannot use expressions). Change them to your owner/repo.
 jobs:
   run-dockerfile-action-fails:
     name: Dockerfile (Fails)
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: a-magdy/test-gh-docker-actions/test-gh-docker/dockerfile@main
+      - uses: a-magdy/gh-actions-docker-demo/test-gh-docker/dockerfile@main
 
   run-dockerfile-action-succeeds:
     name: Dockerfile (Succeeds)
     runs-on: ubuntu-latest
     needs: run-dockerfile-action-fails
     steps:
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.DOCKER_REGISTRY_URL }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Dockerfile Action
         uses: ./test-gh-docker/dockerfile

@@ -71,10 +71,10 @@ test-gh-docker/
 
 ## Example Behavior
 
-After running `docker/login-action@v3` to authenticate with a private registry:
+After running `docker/login-action@v4` to authenticate with a private registry:
 
 ```yaml
-- uses: docker/login-action@v3
+- uses: docker/login-action@v4
   with:
     registry: private-registry
     username: ${{ secrets.DOCKER_USERNAME }}
@@ -84,7 +84,7 @@ After running `docker/login-action@v3` to authenticate with a private registry:
 - uses: my-org/my-docker-action@main  # uses: docker, image: docker://private-registry/image
 
 # ✅ This works - Local call with checkout
-- uses: actions/checkout@v4
+- uses: actions/checkout@v6
 - uses: ./my-docker-action            # Same action, called locally
 
 # ✅ This works - Composite action with docker run
@@ -100,7 +100,7 @@ GitHub Actions tries to pull/build actions dynamically, which happens before all
 1. **Use `actions/checkout` before calling Docker actions locally** (to use either `docker` or `image reference` actions)
 2. **Pre-pull images with `docker pull`** for image reference actions
 3. **Convert to composite actions using `docker run`** (Best solution currently)
-4. **Make images public** (not feasible for enterprise)
+4. **Make images public** (not feasible for enterprise — and note it defeats *this* demo, which relies on the image being private)
 
 ## Expected Behavior
 
@@ -119,7 +119,7 @@ This affects enterprise users with private registries and forces:
 
 - **Runners**: `ubuntu-latest`
 - **Registries**: Tested with ACR, GHCR
-- **Authentication**: `docker/login-action@v3`
+- **Authentication**: `docker/login-action@v4`
 - **GitHub Token**: `GITHUB_TOKEN` with `packages: read` permission
 
 ## References
@@ -134,15 +134,39 @@ This affects enterprise users with private registries and forces:
 This repository is designed to be forkable. After forking:
 
 1. **Run `build-images` workflow** — Go to **Actions → Build and Push Images** and trigger it manually (`workflow_dispatch`). This builds the `ubuntu` and `dind` images from `images/` and pushes them to your GHCR namespace:
-   - `ghcr.io/YOUR-ORG/ubuntu:latest`
-   - `ghcr.io/YOUR-ORG/dind:latest`
+   - `ghcr.io/YOUR-ORG/YOUR-REPO/ubuntu:latest`
+   - `ghcr.io/YOUR-ORG/YOUR-REPO/dind:latest`
 
-2. **(Optional) Make packages public** — In your GHCR package settings, set both packages to **Public** to avoid needing credentials for pulls.
+2. **Keep the packages PRIVATE** — Newly pushed GHCR packages are private by default, which is exactly what this demo needs. **Do not make them public.** ⚠️ Making them public silently breaks the demo: with a public image there's nothing to authenticate against, so every `(Fails)` job starts *succeeding* and the whole point is lost. (This is what once broke this repo.)
 
-3. **Update hardcoded owner refs** — Two files contain a literal `a-magdy` that cannot use expressions:
-   - `test-gh-docker/dockerfile/Dockerfile` — update the `FROM` line
-   - `test-gh-docker/image/action.yml` — update the `image:` value
+   Verify the image is actually private — an anonymous pull must be denied:
 
-   > All workflow files use `${{ github.repository_owner }}` and `${{ github.actor }}` automatically — no changes needed there.
+   ```bash
+   docker logout ghcr.io
+   docker pull ghcr.io/YOUR-ORG/YOUR-REPO/ubuntu:latest   # MUST fail: denied / unauthorized
+   ```
+
+3. **Update hardcoded refs** — A few places use a literal `a-magdy/gh-actions-docker-demo` that **cannot** use `${{ ... }}` expressions. After forking, change each to `YOUR-ORG/YOUR-REPO`:
+   - `test-gh-docker/dockerfile/Dockerfile` — the `FROM` line
+   - `test-gh-docker/image/action.yml` — the `image:` value
+   - the remote `uses: a-magdy/gh-actions-docker-demo/test-gh-docker/...@main` refs in `composite.yml`, `dockerfile.yml`, `image.yml`, `dind.yml`, and `comprehensive.yml`
+
+   > Everything else uses `${{ github.repository }}` / `${{ github.repository_owner }}` / `${{ github.actor }}` automatically — no changes needed there.
 
 4. **Run any workflow** — Authentication uses `GITHUB_TOKEN` (built-in, no secrets to configure).
+
+### Expected results
+
+When the demo is working, the overall run is **green** even though several jobs show a red ✗ — the `(Fails)` jobs are marked `continue-on-error: true` so their expected failure doesn't fail the run:
+
+| Job | Result |
+|---|---|
+| Composite (Succeeds) | ✅ pass |
+| Dockerfile (Succeeds) | ✅ pass |
+| Image (Succeeds) | ✅ pass |
+| DinD - Composite (Succeeds) | ✅ pass |
+| Dockerfile (Fails) | ✗ expected — image pulled before login |
+| Image (Fails) | ✗ expected — image pulled before login |
+| DinD - Image / Dockerfile (Fails) | ✗ expected — same timing problem |
+
+The `(Fails)` jobs should fail at the **image pull during job setup** (a `denied`/`unauthorized` pull), *before* the `docker/login-action` step runs — that's the behavior this repo exists to demonstrate. If a `(Fails)` job passes, the image is probably public.
